@@ -15,7 +15,7 @@ public class UserService {
 	
 	public void 회원가입() {
 		userDao.getUser();
-		userDao.inserUser();
+		userDao.insertUser();
 	}
 
 }

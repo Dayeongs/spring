@@ -6,7 +6,7 @@ import org.springframework.stereotype.Repository;
 public class UserJdbcDao implements UserDao {
 
 	@Override
-	public void inserUser() {
+	public void insertUser() {
 		System.out.println("jdbc 기술로 사용자 저장하기");
 	}
 	

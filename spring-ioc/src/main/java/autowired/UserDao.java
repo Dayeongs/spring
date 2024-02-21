@@ -2,7 +2,7 @@ package autowired;
 
 public interface UserDao {
 
-	void inserUser();
+	void insertUser();
 	void updateUser();
 	void getUser();
 	
