@@ -8,7 +8,8 @@ import org.springframework.stereotype.Component;
 @Aspect
 public class ExceptionAdvice {
 	
-	@AfterThrowing(pointcut = "within(com.sample.service.*)", throwing = "ex")
+	// pointcut 의미 : 반환타입 상관없고 com.sample.service 패키지의 Any클래스의 Any 메소드
+	@AfterThrowing(pointcut = "execution(* com.sample.service.*.*(..))", throwing = "ex")
 	public void handleException(Exception ex) {
 		System.out.println("예외가 발생하였습니다. 오류 메세지: " + ex.getMessage());
 	}
