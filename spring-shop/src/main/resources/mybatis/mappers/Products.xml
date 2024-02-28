@@ -2,12 +2,86 @@
 <!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
 <mapper namespace="com.sample.mapper.ProductMapper">
 	
-	<!-- ProductMapper 인터페이스의
-			void insertProduct(Product product) 추상메소드와 연관된 SQL 구문이다. 
+	<!-- ProductMapper 인터페이스의 void getTotalRows(Criteria criteria) 추상메소드와 연관된 SQL 구문이다. 
 			
-			출력 : void		- resultType 		- 없다.
-			입력 : Product	- patameterType		- com.sample.vo.Product
+			출력 : int		- resultType 		- int
+			입력 : Criteria	- patameterType		- com.sample.web.dto.Criteria
 	-->
+	<select id="getTotalRows" parameterType="com.sample.web.dto.Criteria" resultType="int">
+		select
+			count(*)
+		from
+			shop_products
+		<where>
+			<if test="opt != null">
+				<choose>
+					<when test="opt == 'name'">
+						product_name like '%' || #{keyword} || '%'
+					</when>
+					<when test="opt == 'price'">
+						product_price between 0 and to_number(#{keyword})
+					</when>
+				</choose>
+			</if>
+		</where>
+	</select>
+	
+	<!-- ProductMapper 인터페이스의 void getProducts(Product product) 추상메소드와 연관된 SQL 구문이다. 
+			
+			출력 : List<Product>		- resultType 		- com.sample.vo.Product
+			입력 : Criteria			- patameterType		- com.sample.web.dto.Criteria
+	-->
+	<select id="getProducts" parameterType="com.sample.web.dto.Criteria" resultType="com.sample.vo.Product">
+		select
+			product_no				as no,
+			product_name 			as name,
+			product_price			as price,
+			product_status 			as status,
+			product_stock 			as stock
+		from
+			(select
+				product_no,
+				product_name,
+				product_price,
+				product_status,
+				product_stock,
+				<choose>
+					<when test="sort == 'date'">
+						row_number() over (order by product_no desc) row_num
+					</when>
+					<when test="sort == 'name'">
+						row_number() over (order by product_name asc) row_num
+					</when>					
+					<when test="sort == 'lowprice'">					
+						row_number() over (order by product_price asc) row_num
+					</when>
+					<when test="sort == 'highprice'">
+						row_number() over (order by product_price desc) row_num			
+					</when>
+				</choose>
+			from
+				shop_products
+			<where>
+				<if test="opt != null">
+					<choose>
+						<when test="opt == 'name'">
+							product_name like '%' || #{keyword} || '%'
+						</when>
+						<when test="opt == 'price'">
+							product_price between 0 and to_number(#{keyword})
+						</when>
+					</choose>
+				</if>
+			</where>)
+		where
+			row_num between #{begin} and #{end}
+	</select>
+	
+	<!-- ProductMapper 인터페이스의 List<Product> insertProduct() 추상메소드와 연관된 SQL 구문이다. 
+			
+			출력 : void		- resultType 		- 없다.	
+			입력 : Product	- patameterType		- com.sample.vo.Product
+	-->	
 	<insert id="insertProduct" parameterType="com.sample.vo.Product">
 		insert into shop_products
 		(product_no, product_name, product_description, product_stock, product_price)
@@ -15,8 +89,7 @@
 		(products_seq.nextval, #{name}, #{description}, #{stock}, #{price})
 	</insert>
 	
-	<!-- ProductMapper 인터페이스의
-			List<Product> getAllProducts() 추상메소드와 연관된 SQL 구문이다. 
+	<!-- ProductMapper 인터페이스의 List<Product> getAllProducts() 추상메소드와 연관된 SQL 구문이다. 
 			
 			출력 : List<Product>	- resultType 		- com.sample.vo.Product	
 			입력 : 없다.			- patameterType		- 없다.
@@ -38,8 +111,7 @@
 			product_no desc
 	</select>
 	
-	<!-- ProductMapper 인터페이스의
-			Product getProductByNo(int no) 추상메소드와 연관된 SQL 구문이다. 
+	<!-- ProductMapper 인터페이스의 Product getProductByNo(int no) 추상메소드와 연관된 SQL 구문이다. 
 			
 			출력 : Product	- resultType 		- com.sample.vo.Product		
 			입력 : int		- patameterType		- int
