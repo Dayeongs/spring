@@ -31,9 +31,9 @@
 						</tr>
 						<tr>
 							<th>등록일</th>
-							<td><fmt:formatDate value="${product.createdDate }" pattern="yyyy-mm-dd"/></td>
+							<td><fmt:formatDate value="${product.createdDate }" pattern="yyyy-MM-dd"/></td>
 							<th>수정일</th>
-							<td><fmt:formatDate value="${product.updatedDate }" pattern="yyyy-mm-dd"/></td>
+							<td><fmt:formatDate value="${product.updatedDate }" pattern="yyyy-MM-dd"/></td>
 						</tr>
 						<tr>
 							<th>재고수량</th>

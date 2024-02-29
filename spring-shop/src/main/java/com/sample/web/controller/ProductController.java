@@ -11,7 +11,9 @@ import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 
+import com.sample.service.CompanyService;
 import com.sample.service.ProductService;
+import com.sample.vo.Company;
 import com.sample.vo.Product;
 import com.sample.web.dto.Criteria;
 import com.sample.web.dto.ListDto;
@@ -39,6 +41,9 @@ public class ProductController {
 	 */
 	@Autowired
 	private ProductService productService;
+	
+	@Autowired
+	private CompanyService companyService;
 	
 	/*
 	 * 요청URL 
@@ -91,7 +96,10 @@ public class ProductController {
 	}
 	
 	@GetMapping(path = "/create")
-	public String form() {
+	public String form(Model model) {
+		// 전체 회사정보 조회하고, Model에 저장한다.
+		List<Company> companyList = companyService.getAllCompanies();
+		model.addAttribute("companyList", companyList);
 		
 		return "product/form";		// "/WEB-INF/views/product/form.jsp"로 내부이동
 	}
@@ -106,4 +114,11 @@ public class ProductController {
 	// 2. Form 객체의 멤버변수 분석 (price, name, stock, description)
 	// 3. 멤버변수명과 동일한 이름의 요청파라미터값을 조회한다.
 	// 4. 매개변수에 전달한다.
+	
+	@GetMapping("/delete")
+	public String delete(@RequestParam("no") List<Integer> noList) {
+		productService.deleteProducts(noList);
+		return "redirect:list";
+	}
+	
 }

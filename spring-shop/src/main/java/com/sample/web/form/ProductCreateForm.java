@@ -10,7 +10,8 @@ import lombok.ToString;
 @Setter
 @ToString
 public class ProductCreateForm {
-	
+	// 실제 폼 입력값을 그대로 담을 수 있도록 기본자료형값으로 해야한다.
+	private int companyNo;
 	private String name;
 	private int price;
 	private int stock;

@@ -20,6 +20,7 @@
 			<h1 class="fs-3">상품관리 - 상품 목록</h1>
 			
 			<form id="form-products" method="get" action="list">
+				<input type="hidden" name="page"/>
 				<div class="mb-3 d-flex justify-content-between">
 					<%-- select와 checkbox는 onchange 이벤트가 가장 적절하다. --%>
 					<select class="form-select w-25" name="rows" onchange="changeRows()">
@@ -35,7 +36,7 @@
 								type="radio" 
 								name="sort" 
 								value="date"
-								${empty param.sort or param.sort eq 'data' ? 'checked' : '' } 
+								${empty param.sort or param.sort eq 'date' ? 'checked' : '' } 
 								onchange="changeSort()"/>
 							<label class="form-check-label">최신순</label>
 						</div>
@@ -98,7 +99,7 @@
 							<c:otherwise>
 								<c:forEach var="product" items="${productList }">
 									<tr>
-										<td><input type="checkbox"></td>
+										<td><input type="checkbox" name="no" value="${product.no}"></td>
 										<td><a href="detail?no=${product.no }">${product.name }</a></td>
 										<td><fmt:formatNumber value="${product.price }" /> 원</td>
 										<td><fmt:formatNumber value="${product.stock }" /> 개</td>
@@ -116,21 +117,49 @@
 					</tbody>
 				</table>
 				
-				<div class="row row-cols-lg-auto g-3">
-					<div class="col-12">
-						<select class="form-select" name="opt">
-							<option value="name" ${param.opt eq 'name' ? 'selected' : '' }>상품이름</option>
-							<option value="price" ${param.opt eq 'price' ? 'selected' : '' }>상품가격</option>
-						</select>
+				<div class="row">
+					<div class="col-4">
+						<div class="row row-cols-lg-auto g-3">
+							<div class="col-12">
+								<select class="form-select" name="opt">
+									<option value="name" ${param.opt eq 'name' ? 'selected' : '' }>상품이름</option>
+									<option value="price" ${param.opt eq 'price' ? 'selected' : '' }>상품가격</option>
+								</select>
+							</div>
+							<div class="col-12">
+								<input type="text" class="form-control" name="keyword" value="${param.keyword }"/>
+							</div>
+							<div class="col-12">
+								<button type="submit" class="btn btn-outline-dark">검색</button>
+							</div>
+						</div>
 					</div>
-					<div class="col-12">
-						<input type="text" class="form-control" name="keyword" value="${param.keyword }"/>
+					<div class="col-4">
+						<c:if test="${paging.totalRows ne 0 }">
+							<nav>
+								<ul class="pagination">
+									<li class="page-item">
+										<a href="list?page=${paging.currentPage - 1}" class="page-link ${paging.first ? 'disabled': '' }" 
+											onclick="changePage(${paging.currentPage - 1})">이전</a>
+									</li>
+									<c:forEach var="num" begin="${paging.beginPage }" end="${paging.endPage }">
+										<li class="page-item ${paging.currentPage eq num ? 'active' : '' }">
+											<a href="list?page=${num }" class="page-link" onclick="changePage(${num}, event)">${num}</a>
+										</li>
+									</c:forEach>
+									<li class="page-item">
+										<a href="list?page=${paging.currentPage + 1}" class="page-link ${paging.last ? 'disabled': '' }" 
+											onclick="changePage(${paging.currentPage + 1})">다음</a>
+									</li>
+								</ul>
+							</nav>
+						</c:if>
 					</div>
-					<div class="col-12">
-						<button type="submit" class="btn btn-outline-dark">검색</button>
+					<div class="col-4">
+						<button type="button" class="btn btn-outline-secondary btn-sm" onclick="romoveCheckdProducts()">선택삭제</button>
 					</div>
 				</div>
-				
+
 			</form>
 		</div>
 	</div>
@@ -143,15 +172,47 @@
 	</div>
 </div>
 <script type="text/javascript">
+	/*
+	 	document.getElementById("form-products")는 <form>태그를 표현하는 엘리먼트 객체를 찾아서 반환한다.
+	 	<form>태그를 표현하는 엘리먼트 객체는 submit() 메소드가 있다.
+	 	submit() 메소드를 실행하면 해당 폼의 모든 입력요소를 서버로 제출한다.
+	 */
 	function changeRows() {
 		let form = document.getElementById("form-products");
 		form.submit();
 	}
 	function changeSort() {
-		alert('bbb');	
+		document.getElementById("form-products").submit();
 	}
-	function changePage() {
+	function changePage(page, event) {
+		event.preventDefault();
+		document.querySelector("input[name=page]").value = page;
+		document.getElementById("form-products").submit();
+	}
+	function romoveCheckdProducts() {
+		/*
+			document.querySelectorAll("input");
+				- 태그명이 input인 모든 엘리먼트를 선택한다.
+			document.querySelectorAll("input[type=checkbox]");
+				- 태그명이 input이고, type속성값이 checkbox인 모든 엘리먼트를 선택한다.
+			document.querySelectorAll("input[type=checkbox][name=no]");
+				- 태그명이 input이고, type속성값이 checkbox이고 name속성값이 no인 모든 엘리먼트를 선택한다.
+			document.querySelectorAll("input[type=checkbox][name=no]:checked");
+				- 태그명이 input이고, type속성값이 checkbox이고 name속성값이 no이고, 체크상태가 checked인 모든 엘리먼트를 선택한다.	
+		*/
+		// 체크된 체크박스를 모두 선택한다.
+		let checkedCheckboxes = document.querySelectorAll("input[type=checkbox][name=no]:checked");
+		if (checkedCheckboxes.length == 0) {
+			alert("체크된 체크박스가 없습니다.");
+			return;
+		}
 		
+		// <form> 엘리먼트를 선택한다.
+		let form = document.getElementById("form-products");
+		// <form> 엘리먼트의 action 속성값을 delete로 변경한다.
+		// form을 제출하면 localhost/product/delete 요청을 서버로 보내게 된다.
+		form.setAttribute("action", "delete");
+		form.submit();
 	}
 </script>
 </body>
