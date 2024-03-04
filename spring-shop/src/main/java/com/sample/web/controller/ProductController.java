@@ -102,12 +102,13 @@ public class ProductController {
 		model.addAttribute("companyList", companyList);
 		
 		return "product/form";		// "/WEB-INF/views/product/form.jsp"로 내부이동
+									// JSP 페이지 경로
 	}
 	@PostMapping(path = "/create")
 	public String create(ProductCreateForm productCreateForm) {
 		productService.createProduct(productCreateForm);
 		
-		return "redirect:list";
+		return "redirect:list";		// 재요청 URL
 	}
 	// ProductCreateForm productCreateForm
 	// 1. ProductCreateForm 객체 생성
