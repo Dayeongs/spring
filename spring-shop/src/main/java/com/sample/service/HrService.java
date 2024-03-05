@@ -9,6 +9,9 @@ import com.sample.mapper.DeptMapper;
 import com.sample.mapper.EmpMapper;
 import com.sample.vo.Dept;
 import com.sample.vo.Employee;
+import com.sample.web.dto.Criteria;
+import com.sample.web.dto.ListDto;
+import com.sample.web.dto.Pagination;
 import com.sample.web.form.DeptCreateForm;
 import com.sample.web.form.EmpCreateForm;
 import com.sample.web.form.EmpModifyForm;
@@ -56,6 +59,21 @@ public class HrService {
 
 	public void deleteEmployee(int no) {
 		empMapper.deleteEmployee(no);
+	}
+
+	public ListDto<Employee> getEmployees(Criteria criteria) {
+		
+		int totalRows = empMapper.getTotalRows(criteria);
+		
+		Pagination pagination = new Pagination(criteria.getPage(), totalRows, criteria.getRows());
+		criteria.setBegin(pagination.getBegin());
+		criteria.setEnd(pagination.getEnd());
+		
+		List<Employee> productList = empMapper.getEmployees(criteria);
+		
+		ListDto<Employee> dto = new ListDto<Employee>(productList, pagination);
+		
+		return dto;
 	}
 
 }

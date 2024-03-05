@@ -36,7 +36,7 @@
 					<input type="number" class="form-control" name="salary" />
 				</div>
 				<div class="form-group mb-3">
-					<label class="form-label">고용일</label>
+					<label class="form-label">입사일</label>
 					<input type="date" class="form-control" name="hireDate" />
 				</div>
 				<div class="form-group mb-3">

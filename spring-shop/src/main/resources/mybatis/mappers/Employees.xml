@@ -2,6 +2,80 @@
 <!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
 <mapper namespace="com.sample.mapper.EmpMapper">
 	
+	<select id="getTotalRows" parameterType="com.sample.web.dto.Criteria" resultType="int">
+		select
+			count(*)
+		from
+			shop_employees
+		<where>
+			<if test="opt != null">
+				<choose>
+					<when test="opt == 'name'">
+						emp_name like '%' || #{keyword} || '%'
+					</when>
+					<when test="opt == 'salary'">
+						emp_salary between 0 and to_number(#{keyword})
+					</when>
+				</choose>
+			</if>
+		</where>
+	</select>
+	
+	<select id="getEmployees" parameterType="com.sample.web.dto.Criteria" resultType="com.sample.vo.Employee">
+		select
+			emp_no				as no,
+			emp_name			as name,
+			emp_tel				as tel,
+			emp_email			as email,
+			emp_salary 			as salary,
+			emp_hire_date		as hireDate,
+			dept_no				as "dept.no",
+			dept_name			as "dept.name"
+		from
+			(select
+				E.emp_no,
+				E.emp_name,
+				E.emp_tel,
+				E.emp_email,
+				E.emp_salary,
+				E.emp_hire_date,
+				E.dept_no,
+				D.dept_name,
+				E.emp_created_date,
+				E.emp_updated_date,
+				<choose>
+					<when test="sort == 'hireDate'">
+						row_number() over (order by emp_hire_date desc) row_num
+					</when>
+					<when test="sort == 'name'">
+						row_number() over (order by emp_name asc) row_num
+					</when>					
+					<when test="sort == 'lowsalary'">					
+						row_number() over (order by emp_salary asc) row_num
+					</when>
+					<when test="sort == 'highsalary'">
+						row_number() over (order by emp_salary desc) row_num			
+					</when>
+				</choose>
+			from
+				shop_employees E, shop_depts D
+			<where>
+				E.dept_no = D.dept_no
+				<if test="opt != null">
+					<choose>
+						<when test="opt == 'name'">
+							and E.emp_name like '%' || #{keyword} || '%'
+						</when>
+						<when test="opt == 'salary'">
+							and E.emp_salary between 0 and to_number(#{keyword})
+						</when>
+					</choose>
+				</if>
+			</where>)
+		where
+			row_num between #{begin} and #{end}
+	</select>
+	
 	<!-- 직원 전체 조회 -->
 	<select id="getAllEmployees" resultType="com.sample.vo.Employee">
 		select
