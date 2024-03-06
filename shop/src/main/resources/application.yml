@@ -10,7 +10,7 @@ server:
 logging:
   level:
     root: info
-    '[org.springframework.web]': trace
+    '[org.springframework.web]': info
     '[com.example.web]': debug
     '[com.example.mapper]': trace
   
@@ -18,7 +18,7 @@ spring:
 # 커넥션풀 연결정보를 설정한다.
   datasource:
     driver-class-name: oracle.jdbc.OracleDriver
-    url: jdbc:oracle:thin:!localhost:1521:xe
+    url: jdbc:oracle:thin:@localhost:1521:xe
     username: hta
     password: zxcv1234 
 
