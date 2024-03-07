@@ -20,7 +20,7 @@ public class UserRegisterForm {
 	// VO에 아래와 같은 설정을 할 수 없으므로 Form 클래스를 생성한다.
 	
 	@NotBlank(message = "아이디는 필수입력값입니다.")
-	@Size(min = 6, max = 30, message = "아이디는 최소 6글자 이상, 최대 30글자 이하만 가능합니다.")
+	@Size(min = 3, max = 30, message = "아이디는 최소 6글자 이상, 최대 30글자 이하만 가능합니다.")
 	private String id;
 	
 	@NotBlank(message = "비밀번호는 필수입력값입니다.")
