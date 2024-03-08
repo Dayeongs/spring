@@ -80,7 +80,19 @@ public class SecurityConfig {
 					.usernameParameter("id")			// username은 로그인폼에서 아이디값은 "id"라는 파라미터 이름으로 전달될 것이다.
 					.passwordParameter("password")		// password는 로그인폼에서 비밀번호값은 "password"라는 파라미터 이름으로 전달될 것이다.
 					.failureUrl("/login?error=fail"));	// 로그인에 실패하면 "/login/error"를 재요청 URL로 지정한다. -> 접근불가
-														// -> "/login/error"는 다른 요청 URL이다. "/login"까지만 접근이 허용된다.
+													// -> "/login/error"는 다른 요청 URL이다. "/login"까지만 접근이 허용된다.
+		
+		http
+			// Spring Security의 SecurityFilterChain의 필터에서 예외발생했을 때 예외처리하기
+			// 인증(Authentication)에 대해서 AuthenticationException이 발생한다.
+			// 인가(Authorization)에 대해서 AccessDeniedException이 발생한다.
+			// 인증, 인가 과정에서 발생하는 예외를 처리하는 사용자정의 핸들러 구현해서 등록할 수 있으며, 따로 설정하지 않으면 기본으로 등록되어 있는 핸들러가 동작한다.
+			// 인증 예외는 AuthenticationEntryPoint 인터페이스를 구현한 핸들러를 등록한다.
+			// 인가 예외는 AccessDeniedHandler 인터페이스를 구현한 핸들러를 등록한다.
+			.exceptionHandling((exceptionHandling) -> exceptionHandling
+				.accessDeniedHandler((request, response, accessDeniedException) -> {
+					response.sendRedirect("/accessdenied");
+				}));
 		
 		http
 			// 로그아웃 설정
