@@ -1,0 +1,27 @@
+package com.example.vo;
+
+import java.util.Date;
+
+import org.springframework.stereotype.Service;
+
+import lombok.Getter;
+import lombok.ToString;
+
+@Getter
+@Service
+@ToString
+public class Product {
+
+	private int no;
+	private String name;
+	private String description;
+	private int stock;
+	private String status;
+	private int price;
+	private String filename;
+	private Date updatedDate;
+	private Date createdDate;
+	private Company company;
+	private ProductCategory category;
+	
+}

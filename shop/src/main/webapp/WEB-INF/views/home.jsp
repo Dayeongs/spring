@@ -1,5 +1,6 @@
 <%@ page language="java" contentType="text/html; charset=UTF-8"
     pageEncoding="UTF-8"%>
+<%@ include file="common/tags.jsp" %>
 <!DOCTYPE html>
 <html lang="ko">
 <head>
@@ -16,6 +17,14 @@
 	<div class="row mb-3">
 		<div class="col-12">
 			<h1>홈</h1>
+		</div>
+	</div>
+	<div class="row mb-3">
+		<div class="col-3">
+			<%@ include file="common/category.jsp" %>
+		</div>
+		<div class="col-9">
+		
 		</div>
 	</div>
 </div>
