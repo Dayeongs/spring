@@ -46,7 +46,7 @@
 					</tr>
 					<tr>
 						<th>생일</th>
-						<td colspan="2"><fmt:formatDate value="${user.birth }" pattern="yyyy-MM-dd" /></td>
+						<td colspan="3"><fmt:formatDate value="${user.birth }" pattern="yyyy-MM-dd" /></td>
 					</tr>
 				</tbody>
 			</table>

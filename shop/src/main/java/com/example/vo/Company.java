@@ -17,4 +17,5 @@ public class Company {
 	private String address1;
 	private String address2;
 	
+	
 }

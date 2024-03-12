@@ -62,6 +62,10 @@
 					</tr>
 				</tbody>
 			</table>
+			<div class="text-end">
+				<a href="/order/step1?no=${product.no }" class="btn btn-primary">바로구매</a>
+				<a href="/cart/add?no=${product.no }" class="btn btn-secondary">장바구니</a>
+			</div>
 		</div>
 	</div>
 </div>
