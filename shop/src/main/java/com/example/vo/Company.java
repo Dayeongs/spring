@@ -1,12 +1,11 @@
 package com.example.vo;
 
-import org.springframework.stereotype.Service;
-
 import lombok.Getter;
+import lombok.Setter;
 import lombok.ToString;
 
 @Getter
-@Service
+@Setter
 @ToString
 public class Company {
 

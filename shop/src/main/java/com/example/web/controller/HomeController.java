@@ -6,11 +6,17 @@ import org.springframework.validation.BindingResult;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.ResponseBody;
+import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 
 import com.example.exception.AlreadyUsedEmailException;
 import com.example.exception.AlreadyUsedIdException;
 import com.example.service.UserService;
+import com.example.vo.Company;
+import com.example.vo.User;
 import com.example.web.form.UserRegisterForm;
+
+import java.util.List;
 
 import javax.validation.Valid;
 import lombok.RequiredArgsConstructor;
@@ -45,7 +51,7 @@ public class HomeController {
 	}
 	
 	@PostMapping("/register")
-	public String register(@Valid UserRegisterForm form, BindingResult errors) {
+	public String register(@Valid UserRegisterForm form, BindingResult errors, RedirectAttributes redirectAttributes) {
 		
 		// 폼 입력값 유효성 체크를 통과하지 못한 경우, 회원가입화면으로 내부이동시킨다.
 		if (errors.hasErrors()) {
@@ -54,7 +60,11 @@ public class HomeController {
 		
 		try {
 			// 폼 입력값 유효성 체크를 통과한 경우
-			userService.registerUser(form);			
+			User user = userService.registerUser(form);	
+			redirectAttributes.addFlashAttribute("user", user);
+			
+			return "redirect:/completed";
+			
 		} catch (AlreadyUsedIdException ex) {
 			// 이미 사용중인 아이디인 경우, 유효성 체크를 통과하지 못한 것으로 간주한다.
 			// rejectValue(필드명, 에러코드, 에러메세지) 메소드는 BindingResult 객체에 FieldError를 추가한다.
@@ -66,7 +76,11 @@ public class HomeController {
 			return "form";
 		}
 		
-		return "redirect:/";
+	}
+	
+	@GetMapping("/completed")
+	public String completed() {
+		return "completed";
 	}
 	
 	/*
