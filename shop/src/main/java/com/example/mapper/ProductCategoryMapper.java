@@ -9,7 +9,8 @@ import com.example.vo.ProductCategory;
 @Mapper
 public interface ProductCategoryMapper {
 
-	List<ProductCategory> getProductCategoies();
+	List<ProductCategory> getProductCategories();
+	List<ProductCategory> getProductCategoriesByParentCategoryNo(int categoryNo);
 	ProductCategory getProductCategoryByNo(int no);
 	
 }

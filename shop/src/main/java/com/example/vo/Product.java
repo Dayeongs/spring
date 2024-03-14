@@ -4,11 +4,14 @@ import java.util.Date;
 
 import org.springframework.stereotype.Service;
 
+import com.fasterxml.jackson.annotation.JsonFormat;
+
 import lombok.Getter;
+import lombok.Setter;
 import lombok.ToString;
 
 @Getter
-@Service
+@Setter
 @ToString
 public class Product {
 
@@ -20,6 +23,7 @@ public class Product {
 	private int price;
 	private String filename;
 	private Date updatedDate;
+	@JsonFormat(pattern = "yyyy-MM-dd")
 	private Date createdDate;
 	private Company company;
 	private ProductCategory category;

@@ -6,6 +6,7 @@ import org.springframework.web.bind.annotation.ControllerAdvice;
 import org.springframework.web.bind.annotation.ModelAttribute;
 
 import com.example.service.ProductService;
+import com.example.vo.Company;
 import com.example.vo.ProductCategory;
 
 import lombok.RequiredArgsConstructor;
@@ -31,6 +32,11 @@ public class ModelAttributeAdvice {
 	@ModelAttribute(name = "productCategories")
 	public List<ProductCategory> productCategories() {
 		return productService.getAllProductCategories();
+	}
+	
+	@ModelAttribute(name = "companies")
+	public List<Company> companies() {
+		return productService.getAllCompanies();
 	}
 	
 }
