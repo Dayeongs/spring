@@ -17,6 +17,7 @@
 	<div class="row mb-3">
 		<div class="col-12">
 			<h1>상품 관리</h1>
+			<!-- <button onclick="openPopup()">버튼</button> -->
 		</div>
 
 		<div class="col-3">
@@ -37,10 +38,10 @@
 				<colgroup>
 					<col width="10%">
 					<col width="15%">
-					<col width="45%">
-					<col width="10%">
-					<col width="10%">
-					<col width="10%">
+					<col width="35%">
+					<col width="15%">
+					<col width="15%">
+					<col width="15%">
 				</colgroup>
 				<thead>
 					<tr>
@@ -56,12 +57,17 @@
 					<c:forEach var="product" items="${products }" varStatus="status">
 						<tr>
 							<td>${status.count }</td>
-							<td>${product.category.name }</td>
-							<td>${product.name }</td>
-							<td>${product.company.no }</td>
-							<td><fmt:formatNumber value="${product.price }" /> 원</td>
+							<td><span id="pro-cat-${product.no}">${product.category.name }</span></td>
+							<td><span id="pro-name-${product.no}">${product.name }</span></td>
+							<td><span id="pro-company-${product.no}">${product.company.name }</span></td>
+							<td><span id="pro-price-${product.no}"><fmt:formatNumber value="${product.price }" /></span> 원</td>
+							<%-- 상품 상세보기
 							<td><button class="btn btn-outline-primary btn-sm" 
-								onclick="showProductInfo(${product.no})">상세보기</button></td>
+								onclick="showProductInfo(${product.no})">상세보기</button>
+							</td> --%>
+							<td><button class="btn btn-outline-primary btn-sm" 
+								onclick="showProductForm(${product.no})">수정하기</button>
+							</td>
 						</tr>
 					</c:forEach>
 				</tbody>
@@ -69,9 +75,89 @@
 		</div>
 	</div>
 </div>
-
-<!-- 부트스트랩 팝업 -->
-<div class="modal" tabindex="-1" id="modal-product-info">
+<!-- 상품정보 수정 모달창 
+	 z-index를 설정하여 창이 앞으로 나오게 한다.
+-->
+<div class="modal modal-lg" id="modal-product-form">
+	<div class="modal-dialog">
+		<div class="modal-content">
+			<div class="modal-header">
+				<h5 class="modal-title">상품정보 수정폼</h5>
+				<button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+			</div>
+			<div class="modal-body">
+				<form class="border bg-light p-3">
+					<sec:csrfInput/>
+					<input type="hidden" name="no" />
+					<div class="row mb-3">
+						<div class="col-6">
+							<div class="form-group">
+								<label class="form-label">상위 카테고리</label>
+								<select class="form-select" name="parentCategoryNo" onchange="changeCategory()">
+                        			<c:forEach var="cat" items="${productCategories }">
+                        				<option value="${cat.no }">${cat.name }</option>
+                        			</c:forEach>
+                        		</select>
+                     		</div>
+                  		</div>
+						<div class="col-6">
+							<div class="form-group">
+								<label class="form-label">하위 카테고리</label>
+								<select class="form-select" name="categoryNo">
+                        
+								</select>
+							</div>
+						</div>
+					</div>
+					<div class="row mb-3">
+						<div class="col-6">
+							<div class="form-group">
+								<label class="form-label">상품명</label>
+								<input type="text" class="form-control" name="name" />
+							</div>
+						</div>
+						<div class="col-6">
+							<div class="form-group">
+								<label class="form-label">제조사</label>
+								<select class="form-select" name="companyNo">
+									<c:forEach var="company" items="${companies }">
+                        				<option value="${company.no }">${company.name }</option>
+                        			</c:forEach>
+								</select>
+							</div>
+						</div>
+					</div>
+					<div class="row mb-3">
+						<div class="col-6">
+							<div class="form-group">
+								<label class="form-label">가격</label>
+								<input type="text" class="form-control" name="price" />
+							</div>
+						</div>
+						<div class="col-6">
+							<div class="form-group">
+								<label class="form-label">수량</label>
+								<input type="text" class="form-control" name="stock" />
+							</div>
+						</div>
+					</div>
+					<div class="row mb-3">
+						<div class="form-group">
+							<label class="form-label">설명</label>
+							<textarea class="form-control" rows="3" name="description"></textarea>
+						</div>
+					</div>  
+            	</form>
+			</div>
+			<div class="modal-footer">
+            	<button type="button" class="btn btn-secondary" data-bs-dismiss="modal">닫기</button>
+            	<button type="button" class="btn btn-primary" onclick="submitForm()">수정</button>
+			</div>
+		</div>
+	</div>
+</div>
+<!-- 부트스트랩 팝업 - 상품 상세보기 -->
+<!-- <div class="modal" tabindex="-1" id="modal-product-info">
    <div class="modal-dialog">
       <div class="modal-content">
          <div class="modal-header">
@@ -117,9 +203,108 @@
          </div>
       </div>
    </div>
-</div>
+</div> -->
 <script type="text/javascript">
-	const myModal = new bootstrap.Modal(document.getElementById('modal-product-info'));
+	// const 키워드는 해당 변수가 상수임을 나타낸다.
+	// productFormModal에는 위에서 정의한 Modal을 표현하는 Modal 객체가 대입되어 있고, 그 객체는 변경할 일이 없다.
+	const productFormModal = new bootstrap.Modal("#modal-product-form");
+	
+	function showProductForm(productNo) {
+		setFormValue(productNo);
+		
+		productFormModal.show();
+	}
+	
+	async function setFormValue(productNo) {
+		let response = await fetch("/admin/product/" + productNo)
+		let product = await response.json();
+		
+		// 폼 요소들은 value로 값을 설정한다.
+		setCategory(product.category.parentNo, product.category.no);
+		document.querySelector("input[name=no]").value = product.no;
+		document.querySelector("input[name=name]").value = product.name;
+		document.querySelector("select[name=companyNo]").value = product.company.no;
+		document.querySelector("input[name=price]").value = product.price;
+		document.querySelector("input[name=stock]").value = product.stock;
+		document.querySelector("textarea[name=description]").value = product.description;
+	}
+	
+	async function setCategory(parentNo, no) {
+	
+		document.querySelector("select[name=parentCategoryNo]").value = parentNo;
+		
+		let response = await fetch("/admin/category?catNo=" + parentNo);
+		let subCategories = await response.json();
+		
+		let options = "";
+		for (let index = 0; index < subCategories.length; index++) {
+			let subCategory = subCategories[index];
+			options += `<option value=" \${subCategory.no}" \${subCategory.no == no ? "selected" : ""}> \${subCategory.name}</option>`
+		}
+		document.querySelector("select[name=categoryNo]").innerHTML = options;
+	}
+	
+	function changeCategory() {
+		let parentNo = document.querySelector("select[name=parentCategoryNo]").value;
+		// no의 값이 undefiend이므로 삼항연산자가 ture가 되는 경우가 없다.
+		// undefiend는 변수를 생성하고 값을 초기화하지 않았을 떄 가지는 값이다.
+		setCategory(parentNo);
+	}
+	
+	async function submitForm() {
+		// JSON으로 직렬화 할 자바스크립트 객체를 생성해 전달할 값을 하나씩 조회해서 담는다.
+		// 아래와 같이 작성하면 product의 category에 해당하는 ProductCategory 객체도 생성하고 값도 담을 수 있다.
+		let data = {
+				no: document.querySelector("input[name=no]").value,
+				category: {
+							no: document.querySelector("select[name=categoryNo]").value
+				},
+				name: document.querySelector("input[name=name]").value,
+				company: {
+							no: document.querySelector("select[name=companyNo]").value
+				},
+				price: document.querySelector("input[name=price]").value,
+				stock: document.querySelector("input[name=stock]").value,
+				description: document.querySelector("textarea[name=description]").value
+		};
+		// 자바스크립트 객체를 직렬화한다.
+		let jsonText = JSON.stringify(data);
+		// POST 방식으로 JSON 데이터를 서버로 보낸다.
+		let response = await fetch("/admin/product/modify", {
+			method: "POST",
+			headers: {
+				"Content-Type": "application/json",
+				"X-CSRF-TOKEN": document.querySelector("input[name='_csrf']").value
+			},
+			body: jsonText
+		})
+		if (response.ok) {
+			document.getElementById("pro-name-" + data.no).textContent = data.name;
+			document.getElementById("pro-price-" + data.no).textContent = parseInt(data.price).toLocaleString();
+			
+			// select박스 엘리먼트를 선택한다.
+			let categorySelect = document.querySelector("select[name=categoryNo]");
+			// select.options는 셀렉터박스의 모든 옵션을 배열로 반환한다.
+			// select.selectedIndex는 셀렉터박스의 옵션 중에서 현재 선택된 옵션의 index를 반환한다.
+			// select.options[select.selectIndex]는 셀렉터박스의 옵션 중에서 현재 선택된 옵션 엘리먼트를 반환한다.
+			// select.options[select.selectIndex].textContent는 현재 선택된 옵션 엘리먼트의 텍스트 컨텐츠를 반환한다.
+			let categoryName = categorySelect.options[categorySelect.selectedIndex].textContent;
+			document.getElementById("pro-cat-" + data.no).textContent = categoryName;
+			
+			let companySelect = document.querySelector("select[name=companyNo]");
+			let companyName = companySelect.options[companySelect.selectedIndex].textContent;
+			document.getElementById("pro-company-" + data.no).textContent = companyName;
+			
+			productFormModal.hide();
+		}
+	}
+	
+ 	// 팝업창. 값을 다른 페이지에 전달하기 힘들다. 보통 결제 페이지에 사용한다.
+/* 	function openPopup() {
+		window.open("/", "myPopup", "width=600, height=400");
+	}
+
+ 	const myModal = new bootstrap.Modal(document.getElementById('modal-product-info'));
  
  	function showProductInfo(productNo) {
  		
@@ -129,10 +314,11 @@
  				let text = xhr.responseText;
  				let product = JSON.parse(text);
  				
+ 				(textContent는 태그사이의 값을 넣는다.)
  				document.getElementById("product-no").textContent = product.no;
  				document.getElementById("product-name").textContent = product.name;
  				document.getElementById("product-stock").textContent = product.stock + ' 개';
- 				document.getElementById("product-price").textContent = product.price.toLocaleString() + ' 원';
+ 				document.getElementById("product-price").textContent = product.price.toLocaleString() + ' 원'; // toLocaleString()
  				document.getElementById("category-name").textContent = product.category.name;
  				document.getElementById("company-name").textContent = product.company.name;
  				document.getElementById("create-date").textContent = product.createdDate;
@@ -146,7 +332,7 @@
  		xhr.open("GET", "/admin/product/" + productNo);
  		xhr.send(null);
 	
-	}
+	} */
 </script>
 </body>
 </html>
