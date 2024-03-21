@@ -18,17 +18,22 @@ public class UserController {
 	
 	private final UserService userService;
 	
+	@GetMapping("/login")
+	public String loginform() {
+		return "user/loginform";		// src/main/resources/templates/user/loginform.html
+	}
+	
 	@GetMapping("/signup")
 	public String form(Model model) {
 		model.addAttribute("userSignupForm", new UserSignupForm());
-		return "register-form";	// src/main/resources/templates/register-form.html
+		return "user/register-form";	// src/main/resources/templates/user/register-form.html
 	}
 	
 	@PostMapping("/signup")
 	public String form(@Valid @ModelAttribute("userSignupForm") UserSignupForm form, BindingResult errors) {
 		// BindingResult 객체에 오류가 있으면, 유효성 체크를 통과하지 못한 것이므로 회원가입폼으로 내부이동시킨다.
 		if (errors.hasErrors()) {
-			return "register-form";
+			return "user/register-form";
 		}
 		
 		try {			
@@ -41,7 +46,7 @@ public class UserController {
 			} else if ("email".equals(message)) {
 				errors.rejectValue("email", null, "사용할 수 없는 이메일입니다.");				
 			}
-			return "register-form";
+			return "user/register-form";
 		}
 	}
 	
@@ -49,7 +54,7 @@ public class UserController {
 	public String completed(Long id, Model model) {
 		User user = userService.getUser(id);
 		model.addAttribute("user", user);
-		return "completed";		// src/main/resources/templates/completed.html
+		return "user/completed";		// src/main/resources/templates/completed.html
 	}
 
 }
