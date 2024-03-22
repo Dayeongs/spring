@@ -100,5 +100,13 @@ public class PostService {
 			postVoterRepository.delete(voter);
 		}
 	}
+
+	/**
+	 * 삭제할 게시글 정보를 전달받아서 삭제한다.
+	 * @param post 삭제할 게시글 정보
+	 */
+	public void deletePost(Post post) {
+		postRepository.delete(post);
+	}
 	
 }

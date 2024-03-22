@@ -1,13 +1,16 @@
 package com.example.post;
 
+import java.util.List;
 import java.util.Set;
 
 import com.example.common.BaseDateTimeEntity;
+import com.example.reply.Reply;
 import com.example.user.User;
 
 import jakarta.persistence.CascadeType;
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
+import jakarta.persistence.FetchType;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
@@ -53,7 +56,13 @@ public class Post extends BaseDateTimeEntity {
 	@Column(nullable = false)
 	private String content;
 	
-	@OneToMany(mappedBy = "post", cascade = CascadeType.REMOVE)
+	// 댓글은 순서가 중요하므로 List 사용 (순서보장)
+	@OneToMany(mappedBy = "post", cascade = CascadeType.REMOVE, fetch = FetchType.LAZY)
+	private List<Reply> replies;
+	
+	// 똑같은 사람이 추천할 수 없게 하기 위해서 Set 사용 (중복허용X)
+	@OneToMany(mappedBy = "post", cascade = CascadeType.REMOVE, fetch = FetchType.LAZY)
 	private Set<PostVoter> postVoters;
+	
 
 }
