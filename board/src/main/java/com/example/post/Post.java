@@ -17,6 +17,7 @@ import jakarta.persistence.Id;
 import jakarta.persistence.JoinColumn;
 import jakarta.persistence.ManyToOne;
 import jakarta.persistence.OneToMany;
+import jakarta.persistence.OrderBy;
 import jakarta.persistence.SequenceGenerator;
 import jakarta.persistence.Table;
 import lombok.Getter;
@@ -58,6 +59,7 @@ public class Post extends BaseDateTimeEntity {
 	
 	// 댓글은 순서가 중요하므로 List 사용 (순서보장)
 	@OneToMany(mappedBy = "post", cascade = CascadeType.REMOVE, fetch = FetchType.LAZY)
+	@OrderBy("createdDate asc")
 	private List<Reply> replies;
 	
 	// 똑같은 사람이 추천할 수 없게 하기 위해서 Set 사용 (중복허용X)

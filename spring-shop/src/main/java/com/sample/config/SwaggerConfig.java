@@ -22,7 +22,7 @@ public class SwaggerConfig {
 		return new Info()
 			.title("Spring-shop을 소개합니다.")
 			.description("Springdoc을 사용한 Swagger UI입니다. 안녕ㅎㅎㅎㅎㅎㅎ나는 김다영이라고행~~~~~")
-			.version("1.0.0");
+			.version("1.0");
 	}
     
 }
